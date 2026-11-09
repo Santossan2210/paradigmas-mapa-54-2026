@@ -23,6 +23,9 @@ PASTA_ESTATICOS = Path(__file__).parent / "static"
 ESTATICOS = {
     "/static/estilo.css": "text/css; charset=utf-8",
     "/static/app.js": "text/javascript; charset=utf-8",
+    "/static/telemetria.png": "image/png",
+    "/static/van.png": "image/png",
+    "/static/bicicleta.png": "image/png",
 }
 TAMANHO_MAXIMO_FORMULARIO = 10_000
 ROTA_VEICULO = re.compile(r"^/veiculos/(\d+)/(viagem|bateria|excluir)$")

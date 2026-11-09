@@ -15,9 +15,9 @@
   --critica: #d93636;
   --perigo: #b42318;
   --raio: 12px;
-  /* cartões hexagonais (formato da imagem de referência) */
-  --hex-preenchimento: #D9F2D0;
-  --hex-contorno: #042433;
+  /* cartões com o canto superior direito cortado (formato da imagem de referência) */
+  --card-preenchimento: #D9F2D0;
+  --card-contorno: #042433;
   color-scheme: light;
 }
 
@@ -36,28 +36,26 @@ body {
   min-height: 100vh;
 }
 
-/* Hexágono alongado com pontas à esquerda e à direita.
-   .hex desenha o contorno (fundo escuro recortado); .hex-interno, recortado
+/* Cartão retangular com o canto superior direito cortado em diagonal.
+   .corte desenha o contorno (fundo escuro recortado); .corte-interno, recortado
    pelo mesmo polígono e afastado pela espessura da linha, desenha o preenchimento. */
-.hex {
-  --ponta: 34px;
+.corte {
+  --canto: 22px;
   --linha: 2px;
-  background: var(--hex-contorno);
+  background: var(--card-contorno);
   padding: var(--linha);
   border: 0;
   border-radius: 0;
-  clip-path: polygon(var(--ponta) 0, calc(100% - var(--ponta)) 0, 100% 50%,
-                     calc(100% - var(--ponta)) 100%, var(--ponta) 100%, 0 50%);
+  clip-path: polygon(0 0, calc(100% - var(--canto)) 0, 100% var(--canto), 100% 100%, 0 100%);
 }
-.hex-interno {
-  background: var(--hex-preenchimento);
+.corte-interno {
+  background: var(--card-preenchimento);
   height: 100%;
-  padding: 14px calc(var(--ponta) + 6px);
-  clip-path: polygon(calc(var(--ponta) - 1px) 0, calc(100% - var(--ponta) + 1px) 0, 100% 50%,
-                     calc(100% - var(--ponta) + 1px) 100%, calc(var(--ponta) - 1px) 100%, 0 50%);
+  padding: 14px 16px;
+  clip-path: polygon(0 0, calc(100% - var(--canto) + 1px) 0, 100% calc(var(--canto) - 1px), 100% 100%, 0 100%);
 }
-.veiculo.hex, .formulario.hex { --ponta: 44px; }
-.veiculo.hex .hex-interno, .formulario.hex .hex-interno { padding: 20px calc(var(--ponta) + 12px); }
+.veiculo.corte, .formulario.corte { --canto: 36px; }
+.veiculo.corte .corte-interno, .formulario.corte .corte-interno { padding: 20px 22px; }
 
 a { color: var(--primaria); }
 
@@ -66,7 +64,8 @@ a { color: var(--primaria); }
   padding: 12px 24px; background: var(--superficie); border-bottom: 1px solid var(--borda);
   position: sticky; top: 0; z-index: 1;
 }
-.marca { font-weight: 800; font-size: 1.1rem; }
+.marca { font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
+.marca img { height: 36px; width: auto; }
 .topo nav { display: flex; gap: 4px; flex-wrap: wrap; }
 .topo nav a {
   padding: 6px 12px; border-radius: 8px; text-decoration: none; color: var(--suave); font-weight: 800;
@@ -94,7 +93,7 @@ h2 { font-size: 1.1rem; margin: 0; }
 /* indicadores */
 .indicadores { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
 .indicador { color: var(--suave); font-size: .9rem; min-height: 96px; }
-.indicador .hex-interno { display: flex; flex-direction: column; justify-content: center; text-align: center; }
+.indicador .corte-interno { display: flex; flex-direction: column; justify-content: center; text-align: center; }
 .indicador span { display: block; font-size: 1.7rem; font-weight: 800; color: var(--texto); line-height: 1.2; }
 .indicador.alerta span { color: var(--critica); }
 
@@ -102,13 +101,15 @@ h2 { font-size: 1.1rem; margin: 0; }
 
 /* frota */
 .frota { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
-.cartao:not(.hex) {
+.cartao:not(.corte) {
   background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); padding: 18px;
 }
-.hex input, .hex select { background: #ffffff; border-color: #9fbf95; }
-.hex details { border-top-color: #9fbf95; }
+.corte input, .corte select { background: #ffffff; border-color: #9fbf95; }
+.corte details { border-top-color: #9fbf95; }
 .veiculo header { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; }
-.icone { font-size: 2rem; }
+.icone { width: 56px; height: 48px; object-fit: contain; flex: none; }
+.icone-opcao { width: 28px; height: 24px; object-fit: contain; vertical-align: middle; }
+.icone-tabela { width: 24px; height: 20px; object-fit: contain; vertical-align: middle; margin-right: 4px; }
 
 .bateria .rotulo { display: flex; justify-content: space-between; font-size: .95rem; }
 .bateria strong { font-size: 1.3rem; }
@@ -182,10 +183,8 @@ td.num { text-align: right; font-variant-numeric: tabular-nums; }
 
 @media (max-width: 600px) {
   .topo { padding: 10px 16px; }
-  .hex { --ponta: 18px; }
-  .veiculo.hex, .formulario.hex { --ponta: 22px; }
-  .veiculo.hex .hex-interno, .formulario.hex .hex-interno { padding: 18px calc(var(--ponta) + 6px); }
-  .hex-interno { padding: 12px calc(var(--ponta) + 4px); }
+  .veiculo.corte, .formulario.corte { --canto: 26px; }
+  .veiculo.corte .corte-interno, .formulario.corte .corte-interno { padding: 16px 16px; }
   .duas-colunas, .tipos { grid-template-columns: 1fr; }
   .frota { grid-template-columns: 1fr; }
   .filtros select { min-width: 0; width: 100%; }

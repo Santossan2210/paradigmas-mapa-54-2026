@@ -9,7 +9,12 @@ from html import escape
 
 from .servico import LIMITE_CRITICO, bateria_critica
 
-ICONES = {"van": "🚐", "bicicleta": "🚲"}
+ICONES = {"van": "/static/van.png", "bicicleta": "/static/bicicleta.png"}
+
+
+def icone(tipo, classe="icone"):
+    # imagem decorativa: o tipo do veículo já aparece escrito ao lado
+    return f'<img class="{classe}" src="{ICONES[tipo]}" alt="">'
 
 
 def esc(valor):
@@ -45,12 +50,13 @@ def layout(titulo, corpo, mensagens=(), ativo=""):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{esc(titulo)} · Telemetria EcoFleet</title>
+<link rel="icon" href="/static/telemetria.png">
 <link rel="stylesheet" href="/static/estilo.css">
 <script src="/static/app.js" defer></script>
 </head>
 <body>
 <header class="topo">
-  <div class="marca">⚡ Telemetria EcoFleet</div>
+  <div class="marca"><img src="/static/telemetria.png" alt=""> Telemetria EcoFleet</div>
   <nav>
     {link("/", "Painel", "painel")}
     {link("/veiculos/novo", "Novo veículo", "novo")}
@@ -69,9 +75,9 @@ def layout(titulo, corpo, mensagens=(), ativo=""):
 # ---------- painel ----------
 
 def indicador(valor, texto, alerta=False):
-    # .hex é o contorno; .hex-interno é o preenchimento (ver estilo.css)
-    classe = "indicador hex alerta" if alerta else "indicador hex"
-    return f'<div class="{classe}"><div class="hex-interno"><span>{valor}</span>{texto}</div></div>'
+    # .corte é o contorno; .corte-interno é o preenchimento (ver estilo.css)
+    classe = "indicador corte alerta" if alerta else "indicador corte"
+    return f'<div class="{classe}"><div class="corte-interno"><span>{valor}</span>{texto}</div></div>'
 
 
 def painel(resumo, veiculos, mensagens):
@@ -118,9 +124,9 @@ def cartao_veiculo(v):
     faixa = faixa_bateria(bateria)
     vid = v.id_veiculo
     return f"""
-<article class="veiculo hex"><div class="hex-interno">
+<article class="veiculo corte"><div class="corte-interno">
   <header>
-    <span class="icone" aria-hidden="true">{ICONES[v.TIPO]}</span>
+    {icone(v.TIPO)}
     <div>
       <h2>{esc(v.modelo)}</h2>
       <p class="sub">{esc(v.ROTULO)} · {esc(v.detalhe())} · carga {num(v.capacidade_carga, 0)} kg</p>
@@ -180,14 +186,14 @@ def formulario_veiculo(valores=None, erro=None):
     aviso = f'<div class="mensagem erro" role="alert">{esc(erro)}</div>' if erro else ""
     corpo = f"""
 <h1>Cadastrar veículo</h1>
-<form method="post" action="/veiculos" class="cartao formulario hex" id="form-veiculo"><div class="hex-interno">
+<form method="post" action="/veiculos" class="cartao formulario corte" id="form-veiculo"><div class="corte-interno">
   {aviso}
   <fieldset class="tipos">
     <legend>Tipo de veículo</legend>
     <label class="opcao"><input type="radio" name="tipo" value="van"{marcado("van")}>
-      <span>🚐 <strong>Van elétrica</strong><small>Carga · consome 0,5 ponto de bateria por km</small></span></label>
+      <span>{icone("van", "icone-opcao")} <strong>Van elétrica</strong><small>Carga · consome 0,5 ponto de bateria por km</small></span></label>
     <label class="opcao"><input type="radio" name="tipo" value="bicicleta"{marcado("bicicleta")}>
-      <span>🚲 <strong>Bicicleta elétrica</strong><small>Entrega · consome 0,2 ponto de bateria por km</small></span></label>
+      <span>{icone("bicicleta", "icone-opcao")} <strong>Bicicleta elétrica</strong><small>Entrega · consome 0,2 ponto de bateria por km</small></span></label>
   </fieldset>
 
   <label for="modelo">Modelo</label>
@@ -233,7 +239,7 @@ def historico(viagens, veiculos, filtro_veiculo, somente_criticas, mensagens):
         linhas = "".join(f"""
 <tr>
   <td>{esc(dia_hora(v["registrada_em"]))}</td>
-  <td>{ICONES[v["tipo"]]} {esc(v["modelo"])}</td>
+  <td>{icone(v["tipo"], "icone-tabela")} {esc(v["modelo"])}</td>
   <td class="num">{num(v["distancia"])} km</td>
   <td class="num">{num(v["bateria_inicial"])}% → {num(v["bateria_final"])}%</td>
   <td class="num">{num(v["consumo"])}</td>
