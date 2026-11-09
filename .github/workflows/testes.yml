@@ -31,3 +31,17 @@ jobs:
         run: |
           grep -q "Van elétrica: 75.0%" saida_demo.txt
           grep -q "Bicicleta elétrica: 90.0%" saida_demo.txt
+
+      - name: Processamento funcional (Parte II)
+        run: python -m processamento | tee saida_processamento.txt
+
+      - name: Conferir o processamento
+        run: |
+          grep -q "Resultados idênticos: SIM" saida_processamento.txt
+          grep -q "Primeira viagem crítica: #05" saida_processamento.txt
+
+      - name: Guardar as saídas
+        uses: actions/upload-artifact@v4
+        with:
+          name: saidas
+          path: saida_*.txt

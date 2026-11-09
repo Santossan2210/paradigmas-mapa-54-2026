@@ -10,6 +10,13 @@ Autor: Antonio Santos
 
 from abc import ABC, abstractmethod
 
+try:
+    # Equivalente ao @Override do Java (Python 3.12 ou mais recente)
+    from typing import override
+except ImportError:
+    def override(metodo):
+        return metodo
+
 BATERIA_MINIMA = 0.0
 BATERIA_MAXIMA = 100.0
 
@@ -43,7 +50,7 @@ class Veiculo(ABC):
 
     @abstractmethod
     def registrar_viagem(self, distancia):
-        """Desconta da bateria o consumo da viagem e devolve o nível restante."""
+        """Desconta da bateria o consumo da viagem, mostra o resultado no console e devolve o nível restante."""
 
     # ---- leitura dos demais dados ----
 
@@ -87,9 +94,12 @@ class VanEletrica(Veiculo):
     def placa_identificacao(self):
         return self.__placa_identificacao
 
+    @override
     def registrar_viagem(self, distancia):
         nova_bateria = self.get_autonomia_bateria() - distancia * self.TAXA_CONSUMO
         self.set_autonomia_bateria(nova_bateria)
+        print(f"[{self.ROTULO}] Distância percorrida: {distancia:.1f} km | "
+              f"Bateria restante: {self.get_autonomia_bateria():.1f}%")
         return self.get_autonomia_bateria()
 
     def detalhe(self):
@@ -115,9 +125,12 @@ class BicicletaEletrica(Veiculo):
     def limite_velocidade_assistida(self):
         return self.__limite_velocidade_assistida
 
+    @override
     def registrar_viagem(self, distancia):
         nova_bateria = self.get_autonomia_bateria() - distancia * self.TAXA_CONSUMO
         self.set_autonomia_bateria(nova_bateria)
+        print(f"[{self.ROTULO}] Distância percorrida: {distancia:.1f} km | "
+              f"Bateria restante: {self.get_autonomia_bateria():.1f}%")
         return self.get_autonomia_bateria()
 
     def detalhe(self):

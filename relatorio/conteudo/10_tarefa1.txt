@@ -1,0 +1,61 @@
+# Parte I - Telemetria da frota no paradigma orientado a objetos
+
+O protótipo antigo da EcoFleet aceitava nível de bateria abaixo de 0 ou acima de 100, e com isso os dados da frota perdiam a confiabilidade. Na nova versão, o modelo foi reorganizado em classes, e a bateria só pode ser alterada por um único método, que valida o valor recebido.
+
+## Linguagem adotada
+
+O enunciado descreve a solução em Java. Este trabalho foi implementado em Python, que também é orientado a objetos e oferece um equivalente para cada recurso pedido. A tabela mostra a correspondência usada em todo o documento.
+
+[[TABELA]]
+Pedido no enunciado (Java) | Equivalente usado (Python)
+abstract class Veiculo | class Veiculo(ABC), do módulo abc
+public abstract void registrarViagem(double distancia) | @abstractmethod def registrar_viagem(self, distancia)
+protected (idVeiculo, modelo, capacidadeCarga) | um sublinhado: _id_veiculo, _modelo, _capacidade_carga
+private (autonomiaBateria) | dois sublinhados: __autonomia_bateria
+getAutonomiaBateria() / setAutonomiaBateria(double bateria) | get_autonomia_bateria() / set_autonomia_bateria(bateria)
+class VanEletrica extends Veiculo | class VanEletrica(Veiculo)
+@Override | @override, do módulo typing
+construtor | método __init__
+classe Main com public static void main | função main() do módulo telemetria/demo.py
+pacote telemetria | pasta telemetria/ (pacote Python)
+[[/TABELA]]
+
+Os nomes de métodos e atributos seguem o padrão do Python, com palavras separadas por sublinhado (set_autonomia_bateria em vez de setAutonomiaBateria). As classes mantêm exatamente os nomes do enunciado.
+
+Em Python, o sublinhado simples é uma convenção: avisa que o atributo é de uso interno da classe e das subclasses. Os dois sublinhados fazem o interpretador renomear o atributo para _Veiculo__autonomia_bateria, de modo que ele não é encontrado pelo nome normal fora da classe, nem pelas subclasses. Na prática, a bateria só é acessada pelos dois métodos de acesso.
+
+## Tarefa 1 - Modelagem conceitual
+
+O modelo tem uma superclasse abstrata, Veiculo, e duas subclasses concretas, VanEletrica e BicicletaEletrica. O programa principal (main) só executa a demonstração e não faz parte da hierarquia.
+
+[[TABELA]]
+Classe | Membro | Tipo | Visibilidade
+Veiculo (abstrata) | _id_veiculo (idVeiculo) | int | protegido
+Veiculo (abstrata) | _modelo (modelo) | str | protegido
+Veiculo (abstrata) | _capacidade_carga (capacidadeCarga) | float | protegido
+Veiculo (abstrata) | __autonomia_bateria (autonomiaBateria) | float | privado
+Veiculo (abstrata) | __init__() - construtor sem parâmetros | - | público
+Veiculo (abstrata) | get_autonomia_bateria() | float | público
+Veiculo (abstrata) | set_autonomia_bateria(bateria) | None | público
+Veiculo (abstrata) | registrar_viagem(distancia) - abstrato | float | público
+VanEletrica | __placa_identificacao (placaIdentificacao) | str | privado
+VanEletrica | __init__ com os 5 dados | - | público
+VanEletrica | registrar_viagem(distancia) - sobrescrito | float | público
+BicicletaEletrica | __limite_velocidade_assistida (limiteVelocidadeAssistida) | float | privado
+BicicletaEletrica | __init__ com os 5 dados | - | público
+BicicletaEletrica | registrar_viagem(distancia) - sobrescrito | float | público
+[[/TABELA]]
+
+Relação entre as classes: VanEletrica e BicicletaEletrica herdam de Veiculo. É uma relação do tipo "é um": uma van elétrica é um veículo. As subclasses recebem da superclasse os atributos comuns e o acesso à bateria, e cada uma acrescenta só o que é próprio do seu tipo.
+
+- Veiculo (abstrata): atributos comuns, acesso validado à bateria e o método abstrato registrar_viagem.
+- VanEletrica herda de Veiculo: acrescenta a placa e implementa o consumo de 0.5 ponto por km.
+- BicicletaEletrica herda de Veiculo: acrescenta o limite de velocidade assistida e implementa o consumo de 0.2 ponto por km.
+
+## Por que Veiculo é abstrata
+
+Na frota não existe um veículo genérico: todo veículo real é uma van ou uma bicicleta. Além disso, Veiculo não tem como saber quanto uma viagem consome, porque a taxa depende do tipo. Por isso registrar_viagem é declarado sem implementação na superclasse, e cada subclasse é obrigada a escrevê-lo. Com a classe abstrata, ninguém consegue criar um objeto incompleto (Veiculo() gera erro), e qualquer tipo de veículo incluído no futuro terá de definir a própria regra de consumo. É o uso da classe abstrata como molde comum de uma família de classes (TOKUMOTO, 2022).
+
+## Diferença entre protegido e privado no modelo
+
+O código, o modelo e a capacidade de carga são protegidos: as subclasses os preenchem direto no construtor, e isso não traz risco, porque esses dados não têm regra de validação. A bateria é privada: nem as subclasses chegam ao atributo. Ela só é lida por get_autonomia_bateria() e só é alterada por set_autonomia_bateria(), que aplica a validação. Assim, a regra que corrige o defeito do protótipo fica em um único lugar e não pode ser contornada. A placa e o limite de velocidade também são privados, porque pertencem só à sua subclasse e não precisam ser compartilhados.

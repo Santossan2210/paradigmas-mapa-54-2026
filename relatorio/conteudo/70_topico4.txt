@@ -1,0 +1,20 @@
+## Tópico 4 - Aplicabilidade ao cenário
+
+O cenário pede cálculos repetidos sobre um volume grande de dados, de preferência em paralelo, com resultados consistentes. Cada aspecto abaixo foi observado no exemplo.
+
+Processamento paralelo. Para passar do modo sequencial para o paralelo, bastou trocar a função entregue a agregar: o map do Python pelo map de um ProcessPoolExecutor. O resto do pipeline ficou igual. Isso só é possível porque nenhuma etapa depende de algo que outra etapa esteja alterando.
+
+Como a imutabilidade e as funções puras favorecem o paralelismo. No processamento paralelo, várias tarefas trabalham ao mesmo tempo. Se elas compartilham um dado que pode ser alterado, como um contador de alertas, duas tarefas podem ler o mesmo valor, somar 1 e gravar, e um dos incrementos se perde (condição de corrida). A saída imperativa é proteger o dado com travas, o que faz as tarefas esperarem umas pelas outras e reduz o ganho do paralelismo. No exemplo, o problema não aparece por dois motivos:
+
+- Imutabilidade: viagens, resultados e resumos não podem ser alterados. Cada processo recebe o seu bloco e só lê os dados, e não há nada para travar.
+- Funções puras: calcular uma viagem não depende de outra nem altera nada fora dela. O lote pode ser dividido em blocos, cada bloco vai para um núcleo, e os resumos parciais são somados no final. Como combinar também é pura e associativa, a ordem da soma não muda o total.
+
+Esse é o mesmo argumento de linguagens funcionais modernas, como Clojure, que apostam em dados imutáveis e funções puras justamente para aproveitar processadores de vários núcleos (TOKUMOTO, 2022). O resultado pode ser conferido: no lote de 100.000 viagens, os dois modos chegaram exatamente aos mesmos totais (29.862 viagens de van e 70.138 de bicicleta, com 6.870 e 438 alertas), e o próprio programa compara os resultados.
+
+Grandes volumes. A frota gera muitos registros de viagem por dia. O pipeline descreve o tratamento de uma viagem e aplica a mesma regra a qualquer quantidade, sem mudar o código. Não há variáveis acumuladoras nem índices de laço, que costumam ser fonte de erro quando o volume cresce. A avaliação preguiçosa ajuda também: como map e filter calculam item por item, o lote não precisa ser transformado inteiro de uma vez na memória.
+
+Pipelines de transformação. As regras da EcoFleet formam uma cadeia natural: calcular o consumo, identificar as viagens críticas e totalizar por tipo de veículo. Cada etapa é uma operação separada (map, filter, reduce), que pode ser lida, testada e trocada isoladamente. Uma regra nova, como um alerta de viagem muito longa, entra como mais uma etapa, sem reescrever um laço.
+
+Redução de efeitos colaterais. O único efeito colateral do processamento, que é escrever na tela, fica no programa principal. As funções de cálculo não escrevem em lugar nenhum. Isso evita que uma rotina altere, sem querer, um dado usado por outra.
+
+Previsibilidade e confiabilidade. Com o lote fixo, duas execuções seguidas produzem a mesma saída (exceto os tempos medidos), tanto no computador do autor quanto no servidor do GitHub Actions. Essa previsibilidade permite automatizar a verificação: o servidor confere as linhas esperadas a cada envio. Para a EcoFleet, isso quer dizer que um relatório de consumo pode ser refeito a qualquer momento e vai dar o mesmo número, não importa quantos processadores sejam usados.

@@ -1,0 +1,6 @@
+# Copie este arquivo para identificacao.local.txt e preencha.
+# O arquivo .local.txt fica só no seu computador (está no .gitignore).
+nome_completo=
+ra=
+repositorio_url=https://github.com/Santossan2210/paradigmas-mapa-54-2026
+actions_url=

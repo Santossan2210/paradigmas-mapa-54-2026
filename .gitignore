@@ -13,3 +13,8 @@ __pycache__/
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Relatório gerado e dados pessoais (nunca versionar)
+relatorio/gerado/
+relatorio/identificacao.local.txt
+~$*.docx

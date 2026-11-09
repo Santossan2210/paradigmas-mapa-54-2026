@@ -1,0 +1,83 @@
+## Tópico 3 - Exemplo prático de processamento de dados
+
+Linguagem adotada: Python 3, apenas com a biblioteca padrão. Foram usados map e filter (preguiçosos), functools.reduce, funções lambda, functools.partial, tipos imutáveis (@dataclass(frozen=True), Enum e tuplas) e concurrent.futures.ProcessPoolExecutor para o processamento em paralelo. Python foi escolhido pela continuidade com a Parte I: o mesmo cenário e a mesma regra de consumo aparecem agora resolvidos com outro paradigma, o que permite comparar os dois na prática.
+
+## Premissas da solução
+
+O enunciado não define dados nem regras para o exemplo. As premissas abaixo são decisões do projeto e estão declaradas para separar o que é exigência do trabalho do que é escolha do autor.
+
+[[TABELA]]
+Código | Premissa
+P00 | O cenário é o processamento das viagens da frota EcoFleet (vans e bicicletas elétricas), o mesmo da Parte I.
+P01 | Uma viagem é crítica quando termina com bateria abaixo de 20%. Exatamente 20% não é crítica.
+P02 | O lote de viagens é simulado e é sempre o mesmo (semente fixa 376): cerca de 30% de vans e 70% de bicicletas, distância de 5 a 120 km e bateria inicial de 40% a 100%.
+P03 | O processamento sequencial e o paralelo devem chegar aos mesmos totais.
+P04 | Os dados de entrada nunca são alterados; cada etapa produz dados novos.
+P05 | O cálculo de uma viagem depende só dos dados dela, sem ler ou alterar dados compartilhados.
+[[/TABELA]]
+
+## Estrutura do pipeline
+
+O exemplo segue o fluxo dados de entrada, transformar, selecionar, agregar e resultado final:
+
+- Dados de entrada: uma tupla de viagens (Viagem), gerada por gerar_lote.
+- Transformar (MAP): cada viagem vira um ResultadoViagem, com o consumo, a bateria final e a indicação de viagem crítica, calculados pela função pura calcular.
+- Selecionar (FILTER): ficam apenas as viagens críticas.
+- Agregar (REDUCE): os resultados de cada categoria são somados em um ResumoCategoria, com o número de viagens, os quilômetros, o consumo e a quantidade de alertas.
+- Resultado final: os totais por categoria.
+
+## Código
+
+Tipos de dados (processamento/dados.py). A categoria guarda a taxa de consumo; as três classes imutáveis representam a viagem, o resultado do cálculo e o resumo acumulado.
+
+[[CODIGO:processamento/dados.py]]
+
+Regras como funções puras (processamento/calculo.py):
+
+[[CODIGO:processamento/calculo.py]]
+
+O pipeline (processamento/pipeline.py):
+
+[[CODIGO:processamento/pipeline.py]]
+
+## Como o código funciona
+
+A função calcular recebe uma viagem e devolve um resultado novo: multiplica a distância pela taxa da categoria, subtrai da bateria inicial e aplica a mesma validação da Parte I (fora de 0 a 100 vira 0). Ela não lê nem altera nada além dos seus parâmetros.
+
+transformar e selecionar_criticas apenas montam o fluxo: map e filter devolvem iteradores, e nenhuma viagem é calculada até que alguém percorra o resultado.
+
+resumir aplica as três operações a uma categoria. O filter, com partial, deixa passar só as viagens daquela categoria; o map converte cada resultado em um resumo de uma viagem; e o reduce soma tudo, partindo de um resumo zerado. A soma é feita pela função combinar, que recebe dois resumos e devolve um terceiro. Como a soma é associativa, os resumos podem ser combinados em qualquer ordem e o total não muda. Os totais ficam em números inteiros (distância e consumo em centésimos) para que a soma seja exata: com números de ponto flutuante, somar os mesmos valores em ordens diferentes pode alterar a última casa decimal.
+
+agregar é a função de ordem superior do exemplo. Ela divide o lote em blocos e recebe como parâmetro a função mapear, que aplica resumir_bloco a cada bloco. Com o map do próprio Python, os blocos são resumidos um depois do outro. Com o map de um ProcessPoolExecutor, cada bloco vai para um processo diferente e os núcleos do processador trabalham ao mesmo tempo. Nos dois casos, os totais parciais são juntados com reduce. Nenhuma linha das regras muda entre um modo e outro.
+
+O programa principal (processamento/__main__.py, no repositório) usa o pipeline em três situações: um lote de 10 viagens exibido passo a passo; uma demonstração da avaliação preguiçosa; e um lote de 100.000 viagens processado nos dois modos, para comparar resultado e tempo. Na avaliação preguiçosa, o programa monta um fluxo com map e filter, mostra que nada foi calculado ainda e só então pede a primeira viagem crítica com next. A saída mostra que foram calculadas apenas as viagens #01 a #05; ao encontrar a primeira crítica, o processamento parou, e as viagens #06 a #10 não foram calculadas. Nessa demonstração, o print dentro da função serve só para mostrar quando o cálculo acontece.
+
+## Onde está cada conceito
+
+[[TABELA]]
+Conceito | Onde aparece no código
+Imutabilidade | Viagem, ResultadoViagem e ResumoCategoria com frozen=True; lote e blocos em tuplas; combinar devolve um objeto novo
+Função pura | calcular, validar_bateria, eh_critica, resumo_de, combinar, somar_totais
+Avaliação preguiçosa | transformar e selecionar_criticas devolvem iteradores; na saída, next para na primeira viagem crítica
+Função de ordem superior | agregar recebe a função mapear; map, filter e reduce recebem funções; partial cria uma função nova
+MAP (transformar) | map(calcular, viagens) e map(resumo_de, resultados)
+FILTER (selecionar) | filter(lambda resultado: resultado.critica, ...) e o filtro por categoria
+REDUCE (agregar) | reduce(combinar, ..., ResumoCategoria(categoria)) e reduce(somar_totais, parciais, vazio)
+Paralelismo seguro | agregar(lote, executor.map, nucleos) com o mesmo pipeline; igualdade conferida na saída
+[[/TABELA]]
+
+## Saída da execução
+
+Saída de python -m processamento na execução remota. As viagens #05 e #10 terminaram abaixo de 20% e foram selecionadas; no lote de 100.000 viagens, os totais do modo sequencial e do paralelo foram idênticos.
+
+[[SAIDA:relatorio/saidas/processamento.txt]]
+
+## Teste em ambiente remoto gratuito
+
+O código foi testado no GitHub Actions, serviço gratuito de integração contínua para repositórios públicos. A cada envio ao repositório, um servidor Linux instala o Python, roda os 43 testes automáticos, executa os dois programas e confere as linhas esperadas na saída (75.0%, 90.0%, a primeira viagem crítica e "Resultados idênticos: SIM"). Se alguma conferência falhar, a execução fica vermelha. As saídas mostradas neste documento são as da execução aprovada abaixo.
+
+[[IMAGEM:relatorio/evidencias/actions_aprovado.png]]
+
+Repositório: {{repositorio_url}}
+
+Execução aprovada: {{actions_url}}

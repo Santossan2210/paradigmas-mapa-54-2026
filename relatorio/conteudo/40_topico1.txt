@@ -1,0 +1,17 @@
+# Parte II - O paradigma funcional no processamento paralelo de dados
+
+Esta parte analisa o uso do paradigma funcional em um sistema que precisa fazer cálculos repetidos e processar dados em paralelo, mantendo os resultados consistentes e reduzindo efeitos colaterais. Como o enunciado não define um cenário concreto, foi adotado o processamento das viagens da frota EcoFleet, já apresentada na Parte I (premissa P00, no Tópico 3).
+
+## Tópico 1 - Conceitos do paradigma funcional
+
+No paradigma funcional, o programa é construído pela aplicação e pela composição de funções, no sentido da matemática: uma função recebe valores e devolve um valor novo. Em vez de descrever, passo a passo, como o estado do programa vai mudando, o programador descreve quais transformações os dados devem sofrer. Haskell, Lisp, ML e Scheme têm esse paradigma como base. Outras linguagens, como Python e Java, são multiparadigma: permitem orientação a objetos e também oferecem recursos funcionais, como funções anônimas (lambda) e funções que recebem funções (TOKUMOTO, 2022). Quatro características sustentam o paradigma.
+
+Imutabilidade. Um dado, depois de criado, não muda. Quando algo precisa "mudar", cria-se um valor novo a partir do anterior, e o antigo continua igual. Isso elimina um erro muito comum: um trecho do programa alterar um dado que outro trecho ainda está usando. Um dado imutável pode ser lido por várias partes do programa, até ao mesmo tempo, sem risco de inconsistência. Em Python, tuplas e classes declaradas com @dataclass(frozen=True) são imutáveis: qualquer tentativa de alterar um campo gera erro.
+
+Funções puras. Uma função é pura quando o resultado depende só dos parâmetros recebidos e quando ela não tem efeito colateral, ou seja, não altera variáveis externas, não grava arquivos e não depende de relógio ou de estado global. O ganho é a previsibilidade: a mesma entrada sempre dá a mesma saída. Uma função que consulta uma variável global deixa de ser pura, porque o resultado passa a depender de algo que ela não controla (TOKUMOTO, 2022). Funções puras são fáceis de testar isoladamente e podem ser executadas em qualquer ordem, ou ao mesmo tempo, sem mudar o resultado.
+
+Avaliação preguiçosa. Uma expressão só é calculada quando o resultado é realmente necessário. Se o programa precisa apenas do primeiro item que atende a uma condição, não há motivo para processar a coleção inteira. Também é possível descrever sequências muito grandes, ou infinitas, e consumir só a parte usada. Em Python, map, filter e os geradores funcionam assim: devolvem um iterador, e cada item só é calculado quando alguém pede por ele.
+
+Funções de ordem superior. São funções que recebem outras funções como parâmetro ou devolvem funções como resultado. Elas separam o "o que fazer" do "como percorrer": map, filter e reduce já sabem percorrer uma coleção e recebem apenas a regra a aplicar. O código fica mais curto, com menos repetição e mais fácil de recombinar.
+
+As quatro características se completam. Funções puras sobre dados imutáveis podem ser adiadas, combinadas por funções de ordem superior e distribuídas entre vários processadores sem alterar o resultado, que é exatamente o que um sistema de cálculo paralelo precisa.

@@ -1,0 +1,9 @@
+## Tarefa 3 - Justificativa
+
+O método set_autonomia_bateria é o único caminho para alterar a bateria. Ele testa se o valor recebido está abaixo de 0.0 ou acima de 100.0; nesses casos grava 0.0, e nos demais grava o próprio valor. Como o atributo é privado, nenhuma classe escapa dessa verificação, e o defeito do protótipo antigo deixa de acontecer.
+
+A superclasse Veiculo reúne o que é comum a toda a frota: os atributos de identificação, o acesso à bateria e a validação. As subclasses aproveitam tudo isso pela herança e escrevem apenas o que é delas: a placa, o limite de velocidade e a regra de consumo. Se a validação mudar, a alteração é feita em um só lugar.
+
+Em registrar_viagem, a distância recebida é multiplicada pela taxa do veículo (0.5 na van, 0.2 na bicicleta) e o resultado é subtraído da bateria atual, lida por get_autonomia_bateria. O novo valor é gravado por set_autonomia_bateria; assim, se a viagem esgotar a bateria, o valor negativo vira 0.0.
+
+O construtor de cada subclasse chama o construtor de Veiculo, que inicia tudo com 0, 0.0 ou texto vazio, depois preenche os atributos protegidos e passa a bateria inicial por set_autonomia_bateria. Com isso o objeto já nasce em um estado válido.

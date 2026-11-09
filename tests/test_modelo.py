@@ -1,6 +1,8 @@
 """Testes das regras do modelo orientado a objetos. Autor: Antonio Santos"""
 
+import io
 import unittest
+from contextlib import redirect_stdout
 
 from telemetria.modelo import BicicletaEletrica, VanEletrica, Veiculo
 
@@ -68,6 +70,19 @@ class TestEstrutura(unittest.TestCase):
     def test_heranca(self):
         self.assertIsInstance(van(), Veiculo)
         self.assertIsInstance(bicicleta(), Veiculo)
+
+
+class TestMensagemViagem(unittest.TestCase):
+    """O próprio registrar_viagem mostra no console a distância e a bateria restante."""
+
+    def test_mensagem_no_console(self):
+        saida = io.StringIO()
+        with redirect_stdout(saida):
+            van().registrar_viagem(50.0)
+            bicicleta().registrar_viagem(50.0)
+        texto = saida.getvalue()
+        self.assertIn("[Van elétrica] Distância percorrida: 50.0 km | Bateria restante: 75.0%", texto)
+        self.assertIn("[Bicicleta elétrica] Distância percorrida: 50.0 km | Bateria restante: 90.0%", texto)
 
 
 if __name__ == "__main__":

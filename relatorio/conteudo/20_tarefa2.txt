@@ -1,0 +1,25 @@
+## Tarefa 2 - Implementação
+
+As três classes do modelo ficam no arquivo telemetria/modelo.py, e o programa principal em telemetria/demo.py, os dois dentro do pacote telemetria. A nova bateria é calculada como bateria atual menos distância vezes a taxa do veículo (0.5 ponto por km na van e 0.2 na bicicleta), e o valor é sempre gravado por set_autonomia_bateria().
+
+O arquivo do modelo tem, além do que o enunciado pede, alguns métodos de leitura (como a autonomia estimada em km) usados pela interface web do sistema. Eles não alteram nenhuma regra.
+
+## Classes Veiculo, VanEletrica e BicicletaEletrica (telemetria/modelo.py)
+
+[[CODIGO:telemetria/modelo.py]]
+
+## Programa principal (telemetria/demo.py)
+
+[[CODIGO:telemetria/demo.py]]
+
+## Saída da execução
+
+Saída da execução no GitHub Actions. Partindo de 100%, a viagem de 50 km consome 25 pontos na van (50 x 0.5) e 10 pontos na bicicleta (50 x 0.2), e os níveis finais são 75.0% e 90.0%, como esperado.
+
+[[SAIDA:relatorio/saidas/telemetria_demo.txt]]
+
+O repositório tem 43 testes automáticos. Entre outras coisas, eles conferem a validação da bateria nos limites (0 e 100 são válidos; -5, 100.1 e 120 viram 0), que Veiculo não pode ser instanciada, que a bateria privada não é acessível pelo nome, os valores 75.0 e 90.0 e o esgotamento da bateria em viagem longa.
+
+## Sistema de telemetria
+
+Além da demonstração pedida, o mesmo modelo é usado por um sistema de telemetria com interface web local. Pelo navegador é possível cadastrar vans e bicicletas, registrar viagens, ajustar a bateria depois de uma recarga e consultar o histórico, com alerta para bateria abaixo de 20%. Os dados ficam em um banco SQLite no computador do usuário. Para abrir, basta executar python -m telemetria na pasta do projeto.

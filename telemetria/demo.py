@@ -22,8 +22,7 @@ def main():
 
     # Mesma chamada, comportamento diferente em cada tipo de veículo (polimorfismo)
     for veiculo in (van, bicicleta):
-        restante = veiculo.registrar_viagem(50.0)
-        print(f"[{veiculo.ROTULO}] Distância percorrida: 50.0 km | Bateria restante: {restante:.1f}%")
+        veiculo.registrar_viagem(50.0)
 
     print("--- Nível final de bateria ---")
     print(f"Van elétrica: {van.get_autonomia_bateria():.1f}%")

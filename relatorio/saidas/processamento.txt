@@ -1,0 +1,37 @@
+=== EcoFleet - Processamento funcional das viagens ===
+1) Lote de 10 viagens (semente 376)
+   MAP - cada viagem transformada em resultado:
+   #01 Bicicleta elétrica    87,8 km | bateria  68,3% ->  50,7% | consumo  17,6
+   #02 Van elétrica          64,9 km | bateria  65,5% ->  33,0% | consumo  32,5
+   #03 Van elétrica           5,1 km | bateria  59,7% ->  57,2% | consumo   2,5
+   #04 Bicicleta elétrica    75,6 km | bateria  85,0% ->  69,9% | consumo  15,1
+   #05 Van elétrica          56,7 km | bateria  45,2% ->  16,9% | consumo  28,4  CRÍTICA
+   #06 Bicicleta elétrica    25,5 km | bateria  88,0% ->  82,9% | consumo   5,1
+   #07 Bicicleta elétrica    26,0 km | bateria  40,1% ->  34,9% | consumo   5,2
+   #08 Bicicleta elétrica    92,7 km | bateria  70,4% ->  51,9% | consumo  18,5
+   #09 Bicicleta elétrica    92,8 km | bateria  79,8% ->  61,2% | consumo  18,6
+   #10 Van elétrica          84,0 km | bateria  42,3% ->   0,3% | consumo  42,0  CRÍTICA
+   FILTER - viagens abaixo de 20%: #05, #10
+   REDUCE - totais por categoria:
+   Van elétrica        viagens:       4 | km:        210,7 | consumo:       105,3 pontos | alertas:      2
+   Bicicleta elétrica  viagens:       6 | km:        400,4 | consumo:        80,1 pontos | alertas:      0
+
+2) Avaliação preguiçosa
+   Fluxo montado (map + filter). Nenhuma viagem foi calculada ainda.
+   calculando a viagem #01
+   calculando a viagem #02
+   calculando a viagem #03
+   calculando a viagem #04
+   calculando a viagem #05
+   Primeira viagem crítica: #05. As demais viagens não foram calculadas.
+
+3) Lote de 100.000 viagens - sequencial x paralelo (4 núcleos, média de 5 rodadas)
+   Sequencial:
+   Van elétrica        viagens:  29.862 | km:  1.866.538,8 | consumo:   933.269,4 pontos | alertas:  6.870
+   Bicicleta elétrica  viagens:  70.138 | km:  4.369.500,9 | consumo:   873.900,2 pontos | alertas:    438
+   Paralelo:
+   Van elétrica        viagens:  29.862 | km:  1.866.538,8 | consumo:   933.269,4 pontos | alertas:  6.870
+   Bicicleta elétrica  viagens:  70.138 | km:  4.369.500,9 | consumo:   873.900,2 pontos | alertas:    438
+   Tempo médio sequencial: 1.100,8 ms
+   Tempo médio paralelo:   534,7 ms
+   Resultados idênticos: SIM

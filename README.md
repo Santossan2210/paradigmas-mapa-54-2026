@@ -57,6 +57,26 @@ python -m telemetria.demo
 
 Resultado esperado: van com **75.0%** e bicicleta com **90.0%**.
 
+## Processamento funcional (Parte II da MAPA)
+
+A pasta `processamento/` tem o exemplo de programação funcional: um lote de viagens simuladas passa por `map` (cálculo do consumo), `filter` (viagens críticas) e `reduce` (totais por tipo de veículo). O mesmo pipeline roda em sequência e em paralelo (vários processos), e o programa confere que os totais são idênticos.
+
+```
+python -m processamento
+```
+
+## Relatório
+
+O relatório da MAPA (.docx) é montado a partir dos textos de `relatorio/conteudo/`, do código-fonte e das saídas guardadas em `relatorio/saidas/`. Nome e RA ficam em `relatorio/identificacao.local.txt`, que não vai para o GitHub.
+
+```
+pip install -r relatorio/requirements.txt
+copy relatorio\identificacao.exemplo.txt relatorio\identificacao.local.txt
+python relatorio/gerar_relatorio.py
+```
+
+O arquivo sai em `relatorio/gerado/`. A conferência de cada requisito está em [docs/VALIDACAO_REQUISITOS.md](docs/VALIDACAO_REQUISITOS.md).
+
 ## Testes
 
 ```
@@ -76,6 +96,9 @@ telemetria/
   paginas.py       páginas HTML
   static/          estilo e script da interface
   demo.py          demonstração do enunciado no terminal
+processamento/     exemplo funcional: dados imutáveis, funções puras, map/filter/reduce, paralelismo
+relatorio/         gerador do relatório .docx e textos de cada tarefa e tópico
+docs/              validação dos requisitos
 tests/             testes automáticos (unittest)
 ```
 

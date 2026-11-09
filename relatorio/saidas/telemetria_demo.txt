@@ -1,0 +1,6 @@
+=== EcoFleet Solutions S.A. - Telemetria da Frota ===
+[Van elétrica] Distância percorrida: 50.0 km | Bateria restante: 75.0%
+[Bicicleta elétrica] Distância percorrida: 50.0 km | Bateria restante: 90.0%
+--- Nível final de bateria ---
+Van elétrica: 75.0%
+Bicicleta elétrica: 90.0%
