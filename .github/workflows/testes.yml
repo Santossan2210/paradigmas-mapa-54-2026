@@ -1,0 +1,33 @@
+# Executa os testes e a demonstração a cada envio, em um servidor gratuito do GitHub.
+# Autor: Antonio Santos
+name: Testes da telemetria
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Testes automáticos
+        run: python -m unittest discover -s tests -t . -v
+
+      - name: Demonstração do enunciado
+        run: python -m telemetria.demo | tee saida_demo.txt
+
+      - name: Conferir a demonstração
+        run: |
+          grep -q "Van elétrica: 75.0%" saida_demo.txt
+          grep -q "Bicicleta elétrica: 90.0%" saida_demo.txt

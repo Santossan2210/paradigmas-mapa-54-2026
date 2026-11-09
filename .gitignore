@@ -1,0 +1,15 @@
+# Banco de dados local (dados inseridos no sistema)
+dados/*.db
+dados/*.db-journal
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Editores e sistema operacional
+.idea/
+.vscode/
+Thumbs.db
+Desktop.ini
+.DS_Store
