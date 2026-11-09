@@ -18,8 +18,18 @@ Saída da execução. O GitHub Actions roda o mesmo programa a cada envio e conf
 
 [[SAIDA:relatorio/saidas/telemetria_demo.txt]]
 
-O repositório tem 45 testes automáticos. Entre outras coisas, eles conferem a validação da bateria nos limites (0 e 100 são válidos; -5, 100.1 e 120 viram 0), que Veiculo não pode ser instanciada, que a bateria privada não é acessível pelo nome, os valores 75.0 e 90.0 e o esgotamento da bateria em viagem longa.
+O repositório tem 46 testes automáticos. Entre outras coisas, eles conferem a validação da bateria nos limites (0 e 100 são válidos; -5, 100.1 e 120 viram 0), que Veiculo não pode ser instanciada, que a bateria privada não é acessível pelo nome, os valores 75.0 e 90.0 e o esgotamento da bateria em viagem longa.
 
 ## Sistema de telemetria
 
-Além da demonstração pedida, o mesmo modelo é usado por um sistema de telemetria com interface web local. Pelo navegador é possível cadastrar vans e bicicletas, registrar viagens, ajustar a bateria depois de uma recarga e consultar o histórico, com alerta para bateria abaixo de 20%. Os dados ficam em um banco SQLite no computador do usuário. Para abrir, basta executar python -m telemetria na pasta do projeto.
+Além da demonstração pedida, o mesmo modelo é usado por um sistema de telemetria com interface web local. Pelo navegador é possível cadastrar vans e bicicletas, registrar viagens, ajustar a bateria depois de uma recarga, filtrar o painel por tipo de veículo e consultar o histórico, com alerta para bateria abaixo de 20%. Os dados ficam em um banco SQLite no computador do usuário. Para abrir, basta executar python -m telemetria na pasta do projeto.
+
+Toda alteração de bateria feita pelo sistema passa pelos mesmos métodos das classes acima. Ao registrar uma viagem, o sistema recria o objeto VanEletrica ou BicicletaEletrica com a bateria gravada, chama registrar_viagem e grava o novo nível. A placa da van é aceita no formato antigo (ABC-1234) ou no Mercosul (ABC1D23), e uma placa repetida é recusada.
+
+Para testar o sistema, o autor cadastrou 15 veículos de modelos reais de mercado (8 vans e 7 bicicletas) e registrou 40 viagens, somando 3.114,0 km. A tela abaixo mostra o painel com esses dados: os indicadores, o alerta dos veículos com bateria crítica e os cards da frota, com o filtro por tipo no topo.
+
+[[IMAGEM:relatorio/evidencias/sistema_painel.jpg]]
+
+Das 40 viagens, 5 terminaram com bateria abaixo de 20%. O histórico, com o filtro de viagens críticas marcado, mostra quais foram. Em uma delas a viagem de 125 km esgotou a bateria da van, e o nível foi gravado como 0,0%, e não como um valor negativo, exatamente pela regra de set_autonomia_bateria.
+
+[[IMAGEM:relatorio/evidencias/sistema_criticas.jpg]]

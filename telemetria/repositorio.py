@@ -89,6 +89,22 @@ class Repositorio:
             "SELECT * FROM veiculos WHERE id = ?", (veiculo_id,)).fetchone()
         return self._para_objeto(linha) if linha else None
 
+    def travar_escrita(self):
+        """
+        Abre a transação já reservando a escrita. Assim, entre conferir se a placa
+        existe e gravar o veículo, nenhum outro pedido (um clique duplo, por
+        exemplo) consegue gravar no meio.
+        """
+        if not self.conexao.in_transaction:
+            self.conexao.execute("BEGIN IMMEDIATE")
+
+    def placa_em_uso(self, placa):
+        """Compara sem o hífen, para ABC-1234 e ABC1234 contarem como a mesma placa."""
+        linha = self.conexao.execute(
+            "SELECT 1 FROM veiculos WHERE REPLACE(placa, '-', '') = REPLACE(?, '-', '')",
+            (placa,)).fetchone()
+        return linha is not None
+
     def listar_veiculos(self):
         linhas = self.conexao.execute("SELECT * FROM veiculos ORDER BY id").fetchall()
         return [self._para_objeto(linha) for linha in linhas]

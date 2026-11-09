@@ -74,7 +74,7 @@ Saída de python -m processamento no computador do autor. O lote é sempre o mes
 
 ## Teste em ambiente remoto gratuito
 
-O código foi testado no GitHub Actions, serviço gratuito de integração contínua para repositórios públicos. A cada envio ao repositório, um servidor Linux instala o Python, roda os 45 testes automáticos, executa os dois programas e confere as linhas esperadas na saída (75.0%, 90.0%, a primeira viagem crítica e "Resultados idênticos: SIM"). Se alguma conferência falhar, a execução fica vermelha. A imagem abaixo mostra a execução aprovada.
+O código foi testado no GitHub Actions, serviço gratuito de integração contínua para repositórios públicos. A cada envio ao repositório, um servidor Linux instala o Python, roda os 46 testes automáticos, executa os dois programas e confere as linhas esperadas na saída (75.0%, 90.0%, a primeira viagem crítica e "Resultados idênticos: SIM"). Se alguma conferência falhar, a execução fica vermelha. A imagem abaixo mostra a execução aprovada.
 
 [[IMAGEM:relatorio/evidencias/actions_aprovado.jpg]]
 

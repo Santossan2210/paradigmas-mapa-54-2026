@@ -121,6 +121,10 @@ class SistemaTelemetria:
         bateria = veiculo.get_autonomia_bateria()
 
         with self._repositorio() as repo:
+            if tipo == "van":
+                repo.travar_escrita()
+                if repo.placa_em_uso(extra):
+                    raise ErroValidacao(f"Já existe uma van com a placa {extra}.")
             repo.inserir_veiculo(tipo, modelo, capacidade, bateria,
                                  extra if tipo == "van" else None,
                                  extra if tipo != "van" else None)

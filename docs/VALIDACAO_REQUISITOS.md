@@ -42,7 +42,7 @@ O PROJETO pede Java. Por decisão do autor, a implementação foi feita em Pytho
 | Novo nível calculado com o getter e gravado com o setter | OK | `registrar_viagem` |
 | Mensagem no console com distância e bateria resultante | OK | `print` dentro de `registrar_viagem` |
 | `Main` com `main`, instancia os dois, 100.0 de bateria, viagem de 50.0 km, mostra o nível final | Adaptado | `telemetria/demo.py`, função `main()`: resultado 75.0% e 90.0% |
-| Código testado antes do envio | OK | 45 testes automáticos e GitHub Actions |
+| Código testado antes do envio | OK | 46 testes automáticos e GitHub Actions |
 
 ## Tarefa 3: Justificativa
 

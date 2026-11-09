@@ -24,4 +24,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!confirm(f.dataset.confirmar)) evento.preventDefault();
     });
   });
+
+  // Evita gravar duas vezes com um clique duplo: depois do envio, o botão fica desativado
+  document.querySelectorAll("form[method=post]").forEach((f) => {
+    f.addEventListener("submit", (evento) => {
+      if (evento.defaultPrevented) return;
+      f.querySelectorAll("button").forEach((botao) => { botao.disabled = true; });
+    });
+  });
 });

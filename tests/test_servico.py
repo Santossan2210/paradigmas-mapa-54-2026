@@ -35,6 +35,14 @@ class TestCadastro(BaseSistema):
             with self.subTest(placa=informada):
                 self.assertEqual(normalizar_placa(informada), esperada)
 
+    def test_placa_repetida_e_recusada(self):
+        self.sistema.cadastrar_veiculo("van", "Van 1", "1000", "100", placa="ABC1234")
+        for repetida in ("abc-1234", "ABC 1234"):
+            with self.subTest(placa=repetida), self.assertRaises(ErroValidacao):
+                self.sistema.cadastrar_veiculo("van", "Van 2", "1000", "100", placa=repetida)
+        self.sistema.cadastrar_veiculo("van", "Van 3", "1000", "100", placa="ABC1D23")
+        self.assertEqual(len(self.sistema.listar_veiculos()), 2)
+
     def test_bateria_fora_da_faixa_vira_zero_com_aviso(self):
         resultado = self.sistema.cadastrar_veiculo("bicicleta", "Bike", "30", "120", limite="25")
         self.assertEqual(self.sistema.listar_veiculos()[0].get_autonomia_bateria(), 0.0)
