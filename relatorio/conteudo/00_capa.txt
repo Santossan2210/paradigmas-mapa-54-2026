@@ -21,4 +21,4 @@ O trabalho tem duas partes, com o mesmo cenário da frota EcoFleet.
 - Parte I - Projeto orientado a objetos: modelagem conceitual (Tarefa 1), implementação (Tarefa 2) e justificativa (Tarefa 3).
 - Parte II - Relatório sobre o paradigma funcional: Tópicos 1 a 5, com um exemplo prático de processamento de dados.
 
-As duas partes foram implementadas em Python 3, sem bibliotecas externas. O código está no repositório indicado acima e é testado automaticamente no GitHub Actions a cada envio. As saídas reproduzidas aqui são as da execução remota aprovada.
+As duas partes foram implementadas em Python 3, sem bibliotecas externas. O código está no repositório indicado acima e é testado automaticamente no GitHub Actions a cada envio. As saídas reproduzidas aqui foram geradas no computador do autor; a execução remota roda os mesmos programas e confere as mesmas linhas.

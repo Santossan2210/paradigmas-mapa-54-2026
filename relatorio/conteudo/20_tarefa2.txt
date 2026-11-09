@@ -14,7 +14,7 @@ O arquivo do modelo tem, além do que o enunciado pede, alguns métodos de leitu
 
 ## Saída da execução
 
-Saída da execução no GitHub Actions. Partindo de 100%, a viagem de 50 km consome 25 pontos na van (50 x 0.5) e 10 pontos na bicicleta (50 x 0.2), e os níveis finais são 75.0% e 90.0%, como esperado.
+Saída da execução. O GitHub Actions roda o mesmo programa a cada envio e confere as linhas 75.0% e 90.0%. Partindo de 100%, a viagem de 50 km consome 25 pontos na van (50 x 0.5) e 10 pontos na bicicleta (50 x 0.2), e os níveis finais são 75.0% e 90.0%, como esperado.
 
 [[SAIDA:relatorio/saidas/telemetria_demo.txt]]
 

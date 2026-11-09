@@ -68,13 +68,13 @@ Paralelismo seguro | agregar(lote, executor.map, nucleos) com o mesmo pipeline; 
 
 ## Saída da execução
 
-Saída de python -m processamento na execução remota. As viagens #05 e #10 terminaram abaixo de 20% e foram selecionadas; no lote de 100.000 viagens, os totais do modo sequencial e do paralelo foram idênticos.
+Saída de python -m processamento no computador do autor. O lote é sempre o mesmo, então a execução remota produz os mesmos números; só os tempos mudam de uma máquina para outra. As viagens #05 e #10 terminaram abaixo de 20% e foram selecionadas; no lote de 100.000 viagens, os totais do modo sequencial e do paralelo foram idênticos.
 
 [[SAIDA:relatorio/saidas/processamento.txt]]
 
 ## Teste em ambiente remoto gratuito
 
-O código foi testado no GitHub Actions, serviço gratuito de integração contínua para repositórios públicos. A cada envio ao repositório, um servidor Linux instala o Python, roda os 44 testes automáticos, executa os dois programas e confere as linhas esperadas na saída (75.0%, 90.0%, a primeira viagem crítica e "Resultados idênticos: SIM"). Se alguma conferência falhar, a execução fica vermelha. As saídas mostradas neste documento são as da execução aprovada abaixo.
+O código foi testado no GitHub Actions, serviço gratuito de integração contínua para repositórios públicos. A cada envio ao repositório, um servidor Linux instala o Python, roda os 44 testes automáticos, executa os dois programas e confere as linhas esperadas na saída (75.0%, 90.0%, a primeira viagem crítica e "Resultados idênticos: SIM"). Se alguma conferência falhar, a execução fica vermelha. A imagem abaixo mostra a execução aprovada.
 
 [[IMAGEM:relatorio/evidencias/actions_aprovado.png]]
 

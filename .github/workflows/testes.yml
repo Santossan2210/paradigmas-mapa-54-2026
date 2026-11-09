@@ -14,10 +14,10 @@ jobs:
         shell: bash
     steps:
       - name: Baixar o código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Instalar Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
@@ -41,7 +41,7 @@ jobs:
           grep -q "Primeira viagem crítica: #05" saida_processamento.txt
 
       - name: Guardar as saídas
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: saidas
           path: saida_*.txt
