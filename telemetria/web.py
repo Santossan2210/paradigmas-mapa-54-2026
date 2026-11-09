@@ -17,6 +17,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
 from . import paginas
+from .modelo import TIPOS
 from .servico import ErroValidacao
 
 PASTA_ESTATICOS = Path(__file__).parent / "static"
@@ -64,7 +65,21 @@ def criar_servidor(sistema, porta=8000):
                 return cookie["sessao"].value, False
             return secrets.token_urlsafe(16), True
 
-        def _responder(self, conteudo, status=HTTPStatus.OK, tipo="text/html; charset=utf-8"):
+        def _filtro_painel(self, consulta):
+            """
+            Tipo de veículo exibido no painel. A escolha vem do link (?tipo=) e fica
+            guardada em cookie, para continuar valendo depois de registrar uma
+            viagem, ajustar a bateria ou voltar de outra página.
+            Devolve (filtro, cookie a gravar ou None).
+            """
+            if "tipo" in consulta:
+                filtro = consulta["tipo"] if consulta["tipo"] in TIPOS else ""
+                return filtro, f"filtro={filtro or 'todos'}; Path=/; HttpOnly; SameSite=Strict"
+            cookie = SimpleCookie(self.headers.get("Cookie", ""))
+            guardado = cookie["filtro"].value if "filtro" in cookie else ""
+            return (guardado if guardado in TIPOS else ""), None
+
+        def _responder(self, conteudo, status=HTTPStatus.OK, tipo="text/html; charset=utf-8", cookies=()):
             dados = conteudo.encode("utf-8") if isinstance(conteudo, str) else conteudo
             self.send_response(status)
             self.send_header("Content-Type", tipo)
@@ -77,6 +92,8 @@ def criar_servidor(sistema, porta=8000):
             sessao, nova = self._sessao()
             if nova:
                 self.send_header("Set-Cookie", f"sessao={sessao}; Path=/; HttpOnly; SameSite=Strict")
+            for cookie in cookies:
+                self.send_header("Set-Cookie", cookie)
             self.end_headers()
             self.wfile.write(dados)
 
@@ -120,8 +137,14 @@ def criar_servidor(sistema, porta=8000):
                 return self._responder(arquivo.read_bytes(), tipo=ESTATICOS[url.path])
 
             if url.path == "/":
-                return self._responder(paginas.painel(
-                    sistema.resumo(), sistema.listar_veiculos(), self._mensagens()))
+                filtro, cookie = self._filtro_painel(consulta)
+                todos = sistema.listar_veiculos()
+                contagem = {"": len(todos)}
+                contagem.update({t: sum(1 for v in todos if v.TIPO == t) for t in TIPOS})
+                veiculos = [v for v in todos if not filtro or v.TIPO == filtro]
+                pagina = paginas.painel(sistema.resumo(filtro or None), veiculos,
+                                        self._mensagens(), filtro, contagem)
+                return self._responder(pagina, cookies=[cookie] if cookie else [])
 
             if url.path == "/veiculos/novo":
                 return self._responder(paginas.formulario_veiculo())

@@ -199,11 +199,17 @@ class SistemaTelemetria:
 
     # ---------- painel ----------
 
-    def resumo(self):
-        """Totais do painel, calculados com map, filter e reduce sobre as viagens."""
+    def resumo(self, tipo=None):
+        """
+        Totais do painel, calculados com map, filter e reduce sobre as viagens.
+        Com tipo ("van" ou "bicicleta"), considera só os veículos daquele tipo.
+        """
         with self._repositorio() as repo:
             veiculos = repo.listar_veiculos()
             viagens = repo.listar_viagens()
+        if tipo in TIPOS:
+            veiculos = list(filter(lambda v: v.TIPO == tipo, veiculos))
+            viagens = list(filter(lambda v: v["tipo"] == tipo, viagens))
 
         km_total = reduce(lambda soma, v: soma + v["distancia"], viagens, 0.0)
         consumo_total = sum(map(lambda v: v["consumo"], viagens))

@@ -80,7 +80,23 @@ def indicador(valor, texto, alerta=False):
     return f'<div class="{classe}"><div class="corte-interno"><span>{valor}</span>{texto}</div></div>'
 
 
-def painel(resumo, veiculos, mensagens):
+FILTROS = (("", "Todos", None), ("van", "Vans", "van"), ("bicicleta", "Bicicletas", "bicicleta"))
+NOME_SINGULAR = {"van": "van", "bicicleta": "bicicleta"}
+
+
+def barra_filtro(contagem, filtro):
+    """Escolha do tipo exibido no painel. A escolha fica guardada até ser trocada."""
+    itens = []
+    for valor, texto, tipo_icone in FILTROS:
+        destino = f"/?tipo={valor or 'todos'}"
+        atual = ' aria-current="true"' if valor == filtro else ""
+        imagem = icone(tipo_icone, "icone-opcao") if tipo_icone else ""
+        itens.append(f'<a href="{destino}"{atual}>{imagem}{texto} <small>{contagem[valor]}</small></a>')
+    return f'<nav class="filtro-tipo" aria-label="Mostrar no painel">{"".join(itens)}</nav>'
+
+
+def painel(resumo, veiculos, mensagens, filtro="", contagem=None):
+    contagem = contagem or {"": len(veiculos), "van": 0, "bicicleta": 0}
     cartoes = f"""
 <section class="indicadores">
   {indicador(resumo["veiculos"], "veículos")}
@@ -96,7 +112,7 @@ def painel(resumo, veiculos, mensagens):
         alerta = (f'<div class="mensagem aviso">🔋 Bateria crítica (abaixo de {LIMITE_CRITICO:g}%): '
                   f'{nomes}. Ajuste a bateria após a recarga.</div>')
 
-    if not veiculos:
+    if not contagem[""]:
         corpo = cartoes + """
 <section class="vazio">
   <h1>Nenhum veículo cadastrado</h1>
@@ -109,13 +125,18 @@ def painel(resumo, veiculos, mensagens):
 </section>"""
         return layout("Painel", corpo, mensagens, "painel")
 
-    lista = "".join(cartao_veiculo(v) for v in veiculos)
-    corpo = f"""{cartoes}{alerta}
+    if veiculos:
+        lista = f'<section class="frota">{"".join(cartao_veiculo(v) for v in veiculos)}</section>'
+    else:
+        lista = (f'<section class="vazio"><p>Nenhuma {NOME_SINGULAR[filtro]} cadastrada.</p>'
+                 f'<p><a href="/?tipo=todos">Mostrar todos os veículos</a></p></section>')
+    titulo = {"": "Frota", "van": "Vans elétricas", "bicicleta": "Bicicletas elétricas"}[filtro]
+    corpo = f"""{barra_filtro(contagem, filtro)}{cartoes}{alerta}
 <div class="cabecalho-secao">
-  <h1>Frota</h1>
+  <h1>{titulo}</h1>
   <a class="botao" href="/veiculos/novo">+ Novo veículo</a>
 </div>
-<section class="frota">{lista}</section>"""
+{lista}"""
     return layout("Painel", corpo, mensagens, "painel")
 
 

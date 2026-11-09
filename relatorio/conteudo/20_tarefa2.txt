@@ -18,7 +18,7 @@ Saída da execução. O GitHub Actions roda o mesmo programa a cada envio e conf
 
 [[SAIDA:relatorio/saidas/telemetria_demo.txt]]
 
-O repositório tem 44 testes automáticos. Entre outras coisas, eles conferem a validação da bateria nos limites (0 e 100 são válidos; -5, 100.1 e 120 viram 0), que Veiculo não pode ser instanciada, que a bateria privada não é acessível pelo nome, os valores 75.0 e 90.0 e o esgotamento da bateria em viagem longa.
+O repositório tem 45 testes automáticos. Entre outras coisas, eles conferem a validação da bateria nos limites (0 e 100 são válidos; -5, 100.1 e 120 viram 0), que Veiculo não pode ser instanciada, que a bateria privada não é acessível pelo nome, os valores 75.0 e 90.0 e o esgotamento da bateria em viagem longa.
 
 ## Sistema de telemetria
 

@@ -19,7 +19,7 @@ class TestWeb(unittest.TestCase):
         self.servidor = criar_servidor(self.sistema, porta=0)   # porta 0: o sistema escolhe uma livre
         self.porta = self.servidor.server_address[1]
         threading.Thread(target=self.servidor.serve_forever, daemon=True).start()
-        self.cookie = None
+        self.cookies = {}
 
     def tearDown(self):
         self.servidor.shutdown()
@@ -35,13 +35,14 @@ class TestWeb(unittest.TestCase):
             cabecalhos["Content-Type"] = "application/x-www-form-urlencoded"
         if origem:
             cabecalhos["Origin"] = origem
-        if self.cookie:
-            cabecalhos["Cookie"] = self.cookie
+        if self.cookies:
+            cabecalhos["Cookie"] = "; ".join(f"{k}={v}" for k, v in self.cookies.items())
         conexao.request(metodo, caminho, corpo, cabecalhos)
         resposta = conexao.getresponse()
         texto = resposta.read().decode("utf-8")
-        if resposta.getheader("Set-Cookie"):
-            self.cookie = resposta.getheader("Set-Cookie").split(";")[0]
+        for cookie in resposta.msg.get_all("Set-Cookie") or []:
+            nome, valor = cookie.split(";")[0].split("=", 1)
+            self.cookies[nome] = valor
         conexao.close()
         return resposta, texto
 
@@ -49,6 +50,38 @@ class TestWeb(unittest.TestCase):
         resposta, texto = self.pedir("GET", "/")
         self.assertEqual(resposta.status, 200)
         self.assertIn("Nenhum veículo cadastrado", texto)
+
+    def test_filtro_por_tipo_fica_guardado(self):
+        origem = f"http://127.0.0.1:{self.porta}"
+        self.pedir("POST", "/exemplo", {}, origem)
+
+        _, todos = self.pedir("GET", "/")
+        self.assertIn("EcoCargo E-Van 1500", todos)
+        self.assertIn("EcoBike Urban 25", todos)
+
+        _, vans = self.pedir("GET", "/?tipo=van")
+        self.assertIn("EcoCargo E-Van 1500", vans)
+        self.assertNotIn("EcoBike Urban 25", vans)
+        self.assertIn("Vans elétricas", vans)
+
+        # Depois de uma ação, o painel continua mostrando só as vans
+        van_id = self.sistema.listar_veiculos()[0].id_veiculo
+        self.pedir("POST", f"/veiculos/{van_id}/viagem", {"distancia": "10"}, origem)
+        _, depois = self.pedir("GET", "/")
+        self.assertIn("EcoCargo E-Van 1500", depois)
+        self.assertNotIn("EcoBike Urban 25", depois)
+
+        _, bikes = self.pedir("GET", "/?tipo=bicicleta")
+        self.assertIn("EcoBike Urban 25", bikes)
+        self.assertNotIn("EcoCargo E-Van 1500", bikes)
+
+        _, de_novo = self.pedir("GET", "/?tipo=todos")
+        self.assertIn("EcoCargo E-Van 1500", de_novo)
+        self.assertIn("EcoBike Urban 25", de_novo)
+
+        _, invalido = self.pedir("GET", "/?tipo=<script>")
+        self.assertIn("EcoBike Urban 25", invalido)
+        self.assertNotIn("<script>", invalido)
 
     def test_fluxo_completo(self):
         resposta, _ = self.pedir("POST", "/veiculos", {

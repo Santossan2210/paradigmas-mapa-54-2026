@@ -189,3 +189,22 @@ td.num { text-align: right; font-variant-numeric: tabular-nums; }
   .frota { grid-template-columns: 1fr; }
   .filtros select { min-width: 0; width: 100%; }
 }
+
+/* filtro do painel por tipo de veículo */
+.filtro-tipo {
+  display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; margin-bottom: 16px;
+  background: #ffffff; border: 2px solid var(--card-contorno); border-radius: 10px;
+}
+.filtro-tipo a {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 7px;
+  color: var(--texto); text-decoration: none;
+}
+.filtro-tipo a:hover { background: var(--card-preenchimento); }
+.filtro-tipo a[aria-current="true"] { background: var(--card-contorno); color: #ffffff; }
+.filtro-tipo a[aria-current="true"] img { background: #ffffff; border-radius: 4px; }
+.filtro-tipo small { display: inline; margin: 0; color: inherit; opacity: .75; }
+@media (max-width: 600px) {
+  .filtro-tipo { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; }
+  .filtro-tipo a { justify-content: center; padding: 6px 4px; gap: 4px; font-size: .9rem; }
+  .filtro-tipo .icone-opcao { width: 22px; height: 18px; }
+}
