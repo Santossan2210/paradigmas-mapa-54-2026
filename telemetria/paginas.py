@@ -68,14 +68,20 @@ def layout(titulo, corpo, mensagens=(), ativo=""):
 
 # ---------- painel ----------
 
+def indicador(valor, texto, alerta=False):
+    # .hex é o contorno; .hex-interno é o preenchimento (ver estilo.css)
+    classe = "indicador hex alerta" if alerta else "indicador hex"
+    return f'<div class="{classe}"><div class="hex-interno"><span>{valor}</span>{texto}</div></div>'
+
+
 def painel(resumo, veiculos, mensagens):
     cartoes = f"""
 <section class="indicadores">
-  <div class="indicador"><span>{resumo["veiculos"]}</span>veículos</div>
-  <div class="indicador"><span>{resumo["viagens"]}</span>viagens registradas</div>
-  <div class="indicador"><span>{num(resumo["km_total"])}</span>km rodados</div>
-  <div class="indicador {'alerta' if resumo['viagens_criticas'] else ''}">
-    <span>{resumo["viagens_criticas"]}</span>viagens terminaram abaixo de {LIMITE_CRITICO:g}%</div>
+  {indicador(resumo["veiculos"], "veículos")}
+  {indicador(resumo["viagens"], "viagens registradas")}
+  {indicador(num(resumo["km_total"]), "km rodados")}
+  {indicador(resumo["viagens_criticas"], f"viagens terminaram abaixo de {LIMITE_CRITICO:g}%",
+             alerta=bool(resumo["viagens_criticas"]))}
 </section>"""
 
     alerta = ""
@@ -112,7 +118,7 @@ def cartao_veiculo(v):
     faixa = faixa_bateria(bateria)
     vid = v.id_veiculo
     return f"""
-<article class="veiculo">
+<article class="veiculo hex"><div class="hex-interno">
   <header>
     <span class="icone" aria-hidden="true">{ICONES[v.TIPO]}</span>
     <div>
@@ -154,7 +160,7 @@ def cartao_veiculo(v):
       </form>
     </div>
   </details>
-</article>"""
+</div></article>"""
 
 
 # ---------- cadastro ----------
@@ -174,7 +180,7 @@ def formulario_veiculo(valores=None, erro=None):
     aviso = f'<div class="mensagem erro" role="alert">{esc(erro)}</div>' if erro else ""
     corpo = f"""
 <h1>Cadastrar veículo</h1>
-<form method="post" action="/veiculos" class="cartao formulario" id="form-veiculo">
+<form method="post" action="/veiculos" class="cartao formulario hex" id="form-veiculo"><div class="hex-interno">
   {aviso}
   <fieldset class="tipos">
     <legend>Tipo de veículo</legend>
@@ -212,7 +218,7 @@ def formulario_veiculo(valores=None, erro=None):
     <button class="botao">Cadastrar</button>
     <a href="/">Cancelar</a>
   </div>
-</form>"""
+</div></form>"""
     return layout("Novo veículo", corpo, ativo="novo")
 
 
