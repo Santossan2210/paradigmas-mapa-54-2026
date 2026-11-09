@@ -15,11 +15,27 @@ from .repositorio import Repositorio
 
 LIMITE_CRITICO = 20.0          # abaixo disto a bateria é considerada crítica
 DISTANCIA_MAXIMA = 1000.0      # maior viagem aceita em um único registro (km)
-PLACA = re.compile(r"^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$")   # padrão antigo e Mercosul
+PLACA_ANTIGA = re.compile(r"^[A-Z]{3}[0-9]{4}$")             # ABC-1234
+PLACA_MERCOSUL = re.compile(r"^[A-Z]{3}[0-9][A-Z][0-9]{2}$")  # ABC1D23
 
 
 class ErroValidacao(Exception):
     """Dado informado pelo usuário que não pode ser aceito."""
+
+
+def normalizar_placa(texto):
+    """
+    Aceita a placa no formato antigo (3 letras e 4 números, ABC-1234) ou no
+    Mercosul (3 letras, número, letra e 2 números, ABC1D23), com ou sem hífen,
+    espaço e em letras minúsculas. Devolve a placa padronizada: a antiga com
+    hífen e a Mercosul sem hífen, como aparecem nas placas dos veículos.
+    """
+    placa = str(texto).strip().upper().replace("-", "").replace(" ", "")
+    if PLACA_ANTIGA.match(placa):
+        return f"{placa[:3]}-{placa[3:]}"
+    if PLACA_MERCOSUL.match(placa):
+        return placa
+    raise ErroValidacao("Placa inválida. Use o formato antigo (ABC-1234) ou o Mercosul (ABC1D23).")
 
 
 @dataclass
@@ -94,10 +110,7 @@ class SistemaTelemetria:
         bateria_informada = _numero(bateria, "o nível de bateria")
 
         if TIPOS[tipo] is VanEletrica:
-            placa = str(placa).strip().upper().replace("-", "").replace(" ", "")
-            if not PLACA.match(placa):
-                raise ErroValidacao("Placa inválida. Use o formato ABC1234 ou ABC1D23.")
-            extra = placa
+            extra = normalizar_placa(placa)
         else:
             extra = _numero(limite, "o limite de velocidade assistida")
             if extra <= 0:

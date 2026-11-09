@@ -74,7 +74,7 @@ Saída de python -m processamento na execução remota. As viagens #05 e #10 ter
 
 ## Teste em ambiente remoto gratuito
 
-O código foi testado no GitHub Actions, serviço gratuito de integração contínua para repositórios públicos. A cada envio ao repositório, um servidor Linux instala o Python, roda os 43 testes automáticos, executa os dois programas e confere as linhas esperadas na saída (75.0%, 90.0%, a primeira viagem crítica e "Resultados idênticos: SIM"). Se alguma conferência falhar, a execução fica vermelha. As saídas mostradas neste documento são as da execução aprovada abaixo.
+O código foi testado no GitHub Actions, serviço gratuito de integração contínua para repositórios públicos. A cada envio ao repositório, um servidor Linux instala o Python, roda os 44 testes automáticos, executa os dois programas e confere as linhas esperadas na saída (75.0%, 90.0%, a primeira viagem crítica e "Resultados idênticos: SIM"). Se alguma conferência falhar, a execução fica vermelha. As saídas mostradas neste documento são as da execução aprovada abaixo.
 
 [[IMAGEM:relatorio/evidencias/actions_aprovado.png]]
 

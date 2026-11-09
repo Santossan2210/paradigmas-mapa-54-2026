@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from telemetria.servico import ErroValidacao, SistemaTelemetria
+from telemetria.servico import ErroValidacao, SistemaTelemetria, normalizar_placa
 
 
 class BaseSistema(unittest.TestCase):
@@ -28,6 +28,13 @@ class TestCadastro(BaseSistema):
         self.assertEqual(veiculo.placa_identificacao, "ABC1D23")
         self.assertEqual(veiculo.get_autonomia_bateria(), 100.0)
 
+    def test_formatos_de_placa(self):
+        casos = [("abc1234", "ABC-1234"), ("ABC-1234", "ABC-1234"), ("abc 1234", "ABC-1234"),
+                 ("abc1d23", "ABC1D23"), ("ABC-1D23", "ABC1D23"), (" eco1a26 ", "ECO1A26")]
+        for informada, esperada in casos:
+            with self.subTest(placa=informada):
+                self.assertEqual(normalizar_placa(informada), esperada)
+
     def test_bateria_fora_da_faixa_vira_zero_com_aviso(self):
         resultado = self.sistema.cadastrar_veiculo("bicicleta", "Bike", "30", "120", limite="25")
         self.assertEqual(self.sistema.listar_veiculos()[0].get_autonomia_bateria(), 0.0)
@@ -45,6 +52,10 @@ class TestCadastro(BaseSistema):
             ("van", "X", "1", "abc", "ABC1234", ""),           # bateria não numérica
             ("van", "X", "1", "nan", "ABC1234", ""),           # NaN escaparia da validação
             ("van", "X", "1", "50", "12345", ""),              # placa inválida
+            ("van", "X", "1", "50", "ABC1D2X", ""),            # Mercosul com letra no fim
+            ("van", "X", "1", "50", "ABCD1E20", ""),           # 4 letras: não existe
+            ("van", "X", "1", "50", "AB12345", ""),            # 2 letras
+            ("van", "X", "1", "50", "ABC12D3", ""),            # letra na posição errada
             ("bicicleta", "X", "1", "50", "", "0"),            # limite zero
         ]
         for caso in casos:

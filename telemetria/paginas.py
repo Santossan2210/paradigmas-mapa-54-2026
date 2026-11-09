@@ -213,7 +213,8 @@ def formulario_veiculo(valores=None, erro=None):
 
   <div data-tipo="van">
     <label for="placa">Placa (só van)</label>
-    <input id="placa" name="placa" maxlength="8" value="{valor('placa')}" placeholder="ABC1D23" autocapitalize="characters">
+    <input id="placa" name="placa" maxlength="8" value="{valor('placa')}" placeholder="ABC-1234 ou ABC1D23" autocapitalize="characters" aria-describedby="ajuda-placa">
+    <small id="ajuda-placa">Formato antigo (ABC-1234) ou Mercosul (ABC1D23).</small>
   </div>
   <div data-tipo="bicicleta">
     <label for="limite">Limite de velocidade assistida em km/h (só bicicleta)</label>
