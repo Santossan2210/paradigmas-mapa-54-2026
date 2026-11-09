@@ -26,10 +26,10 @@ Além da demonstração pedida, o mesmo modelo é usado por um sistema de teleme
 
 Toda alteração de bateria feita pelo sistema passa pelos mesmos métodos das classes acima. Ao registrar uma viagem, o sistema recria o objeto VanEletrica ou BicicletaEletrica com a bateria gravada, chama registrar_viagem e grava o novo nível. A placa da van é aceita no formato antigo (ABC-1234) ou no Mercosul (ABC1D23), e uma placa repetida é recusada.
 
-Para testar o sistema, o autor cadastrou 15 veículos de modelos reais de mercado (8 vans e 7 bicicletas) e registrou 40 viagens, somando 3.114,0 km. A tela abaixo mostra o painel com esses dados: os indicadores, o alerta dos veículos com bateria crítica e os cards da frota, com o filtro por tipo no topo.
+Para testar o sistema, o autor cadastrou 14 veículos de modelos reais de mercado (7 vans e 7 bicicletas) e registrou 38 viagens, somando 2.911,0 km. A tela abaixo mostra o painel com esses dados: os indicadores, o alerta dos veículos com bateria crítica e os cards da frota, com o filtro por tipo no topo.
 
 [[IMAGEM:relatorio/evidencias/sistema_painel.jpg]]
 
-Das 40 viagens, 5 terminaram com bateria abaixo de 20%. O histórico, com o filtro de viagens críticas marcado, mostra quais foram. Em uma delas a viagem de 125 km esgotou a bateria da van, e o nível foi gravado como 0,0%, e não como um valor negativo, exatamente pela regra de set_autonomia_bateria.
+Das 38 viagens, 4 terminaram com bateria abaixo de 20%. O histórico, com o filtro de viagens críticas marcado, mostra quais foram. A mais longa foi a da van JAC e-JV5.5: 195 km consumiram 97,5 pontos (195 x 0.5), e a bateria passou de 100,0% para 2,5%. Se a viagem tivesse passado de 200 km, o cálculo daria um valor negativo, e set_autonomia_bateria gravaria 0,0%.
 
 [[IMAGEM:relatorio/evidencias/sistema_criticas.jpg]]
